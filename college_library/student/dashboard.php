@@ -34,6 +34,16 @@ if (!isset($_SESSION['student_id'])) {
             My Books
         </a>
     </li>
+    <li>
+    <a href="fines.php">
+        My Fines
+    </a>
+</li>
+<li>
+    <a href="my_requests.php">
+        My Requests
+    </a>
+</li>
 
     <li>
         <a href="logout.php">

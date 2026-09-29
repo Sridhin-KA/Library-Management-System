@@ -79,7 +79,11 @@ if (!isset($_SESSION['admin'])) {
                 Fines
             </a>
         </li>
-
+    <li>
+    <a href="book_requests.php">
+        Book Requests
+    </a>
+</li>
     </ul>
 
     <br>
