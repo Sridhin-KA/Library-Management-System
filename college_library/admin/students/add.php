@@ -9,6 +9,8 @@ if (!isset($_SESSION['admin'])) {
 
 require_once "../../config/db.php";
 
+$error = "";
+
 if (isset($_POST['add_student'])) {
 
     $name = $_POST['name'];
@@ -19,9 +21,9 @@ if (isset($_POST['add_student'])) {
     $department = $_POST['department'];
 
     $sql = "INSERT INTO students
-            (name, email, phone, department,username,password)
+            (name, email, phone, department, username, password)
             VALUES
-            ('$name', '$email', '$phone', '$department','$username','$password')";
+            ('$name', '$email', '$phone', '$department', '$username', '$password')";
 
     if (mysqli_query($conn, $sql)) {
 
@@ -30,77 +32,533 @@ if (isset($_POST['add_student'])) {
 
     } else {
 
-        echo "Error: " . mysqli_error($conn);
-
+        $error = mysqli_error($conn);
     }
 }
 
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Add Student</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Student | College Library</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1120;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            height: 72px;
+            background: #111827;
+            border-bottom: 1px solid #243044;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 45px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+
+            background: #f5b942;
+            color: #0b1120;
+
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-badge {
+            color: #f5b942;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .logout {
+            text-decoration: none;
+            color: #ffffff;
+            border: 1px solid #334155;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .logout:hover {
+            border-color: #f5b942;
+            color: #f5b942;
+        }
+
+        /* PAGE */
+
+        .container {
+            max-width: 850px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* CARD */
+
+        .card {
+            background: #111827;
+            border: 1px solid #243044;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+
+            background: #0b1120;
+            border: 1px solid #334155;
+
+            border-radius: 8px;
+
+            color: #ffffff;
+            font-size: 14px;
+
+            outline: none;
+
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #f5b942;
+            box-shadow: 0 0 0 2px rgba(245, 185, 66, 0.08);
+        }
+
+        input::placeholder {
+            color: #64748b;
+        }
+
+        /* ERROR */
+
+        .error {
+            background: rgba(239, 68, 68, 0.10);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+
+            color: #fca5a5;
+
+            padding: 12px 15px;
+            border-radius: 8px;
+
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        /* BUTTONS */
+
+        .actions {
+            margin-top: 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding-top: 22px;
+            border-top: 1px solid #243044;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #94a3b8;
+
+            border: 1px solid #334155;
+
+            padding: 11px 20px;
+            border-radius: 8px;
+
+            font-size: 13px;
+
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #ffffff;
+            border-color: #64748b;
+        }
+
+        .submit-btn {
+            border: none;
+
+            background: #f5b942;
+            color: #0b1120;
+
+            padding: 12px 24px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #ffd166;
+            transform: translateY(-1px);
+        }
+
+        /* INFO */
+
+        .info {
+            margin-top: 18px;
+
+            padding: 14px 16px;
+
+            background: rgba(245, 185, 66, 0.06);
+            border: 1px solid rgba(245, 185, 66, 0.15);
+
+            border-radius: 8px;
+
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .info strong {
+            color: #f5b942;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .admin-badge {
+                display: none;
+            }
+
+            .container {
+                margin: 30px auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: span 1;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .submit-btn,
+            .back-btn {
+                text-align: center;
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-    <h1>Add Student</h1>
+    <!-- NAVBAR -->
 
-    <form method="POST">
+    <div class="navbar">
 
-        <label>Name</label>
-        <br>
+        <div class="brand">
 
-        <input type="text" name="name" required>
+            <div class="logo">
+                L
+            </div>
 
-        <br><br>
+            <div class="brand-text">
 
-        <label>Email</label>
-        <br>
+                <h2>College Library</h2>
 
-        <input type="email" name="email">
+                <span>ADMIN PANEL</span>
 
-        <br><br>
+            </div>
 
-        <label>Phone</label>
-        <br>
+        </div>
 
-        <input type="text" name="phone">
+        <div class="nav-right">
 
-        <br><br>
-        <label>Username</label>
-        <br>
+            <span class="admin-badge">
+                ADMIN
+            </span>
 
-        <input type="text" name="username">
+            <a href="../../logout.php" class="logout">
+                Logout
+            </a>
 
-        <br><br>
-        <label>Password</label>
-        <br>
+        </div>
 
-        <input type="text" name="password">
+    </div>
 
-        <br><br>
 
-        <label>Department</label>
-        <br>
+    <!-- CONTENT -->
 
-        <input type="text" name="department">
+    <div class="container">
 
-        <br><br>
+        <div class="page-header">
 
-        <button type="submit" name="add_student">
-            Add Student
-        </button>
+            <h1>Add Student</h1>
 
-    </form>
+            <p>
+                Register a new student in the college library system.
+            </p>
 
-    <br>
+        </div>
 
-    <a href="view.php">
-        Back
-    </a>
+
+        <div class="card">
+
+            <div class="card-title">
+                Student Information
+            </div>
+
+
+            <?php if ($error != "") { ?>
+
+                <div class="error">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+
+            <?php } ?>
+
+
+            <form method="POST">
+
+                <div class="form-grid">
+
+
+                    <!-- NAME -->
+
+                    <div class="form-group">
+
+                        <label>Student Name</label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Enter student name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="form-group">
+
+                        <label>Department</label>
+
+                        <input
+                            type="text"
+                            name="department"
+                            placeholder="e.g. Computer Science"
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label>Email</label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="student@example.com"
+                        >
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="form-group">
+
+                        <label>Phone</label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            placeholder="Enter phone number"
+                        >
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="form-group">
+
+                        <label>Username</label>
+
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Create username"
+                        >
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label>Password</label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Create password"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="info">
+
+                    <strong>Login details:</strong>
+                    The username and password entered here will be used by
+                    the student to access the Student Portal.
+
+                </div>
+
+
+                <div class="actions">
+
+                    <a href="view.php" class="back-btn">
+                        ← Back to Students
+                    </a>
+
+                    <button
+                        type="submit"
+                        name="add_student"
+                        class="submit-btn"
+                    >
+                        + Add Student
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </body>
 
