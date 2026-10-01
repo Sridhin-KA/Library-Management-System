@@ -135,6 +135,7 @@ college_library/
 ├── logout.php
 └── database.sql
 
+
 🗄️ Database
 The project uses MySQL with the following tables:
 admin
