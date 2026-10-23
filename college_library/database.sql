@@ -34,6 +34,24 @@ CREATE TABLE publishers (
     name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS book_requests (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT NOT NULL,
+    book_id INT NOT NULL,
+    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Pending', 'Approved', 'Rejected')
+        NOT NULL DEFAULT 'Pending',
+
+    CONSTRAINT fk_request_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_request_book
+        FOREIGN KEY (book_id)
+        REFERENCES books(id)
+        ON DELETE CASCADE
+);
 
 -- 5. Books table
 CREATE TABLE books (
