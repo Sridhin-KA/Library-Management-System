@@ -1,4 +1,4 @@
-```sql
+
 CREATE DATABASE IF NOT EXISTS college_library;
 USE college_library;
 
@@ -159,4 +159,3 @@ INSERT INTO admin (username, password)
 VALUES ('admin', 'REPLACE_WITH_VALID_ADMIN_HASH');
 
 SELECT 'College Library database created successfully' AS message;
-```
