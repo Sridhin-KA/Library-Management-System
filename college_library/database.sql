@@ -2,14 +2,14 @@
 CREATE DATABASE IF NOT EXISTS college_library;
 USE college_library;
 
--- 1. Admin table
+-- 1. ADMIN TABLE
 CREATE TABLE admin (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB;
 
--- 2. Students table
+-- 2. STUDENTS TABLE
 CREATE TABLE students (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -18,21 +18,21 @@ CREATE TABLE students (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     department VARCHAR(100)
-);
+) ENGINE=InnoDB;
 
--- 3. Authors table
+-- 3. AUTHORS TABLE
 CREATE TABLE authors (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL
-);
+) ENGINE=InnoDB;
 
--- 4. Publishers table
+-- 4. PUBLISHERS TABLE
 CREATE TABLE publishers (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL
-);
+) ENGINE=InnoDB;
 
--- 5. Books table
+-- 5. BOOKS TABLE
 CREATE TABLE books (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(150) NOT NULL,
@@ -42,10 +42,12 @@ CREATE TABLE books (
     available_quantity INT NOT NULL DEFAULT 0,
 
     CONSTRAINT fk_books_author
-        FOREIGN KEY (author_id) REFERENCES authors(id),
+        FOREIGN KEY (author_id)
+        REFERENCES authors(id),
 
     CONSTRAINT fk_books_publisher
-        FOREIGN KEY (publisher_id) REFERENCES publishers(id),
+        FOREIGN KEY (publisher_id)
+        REFERENCES publishers(id),
 
     CONSTRAINT chk_book_quantity
         CHECK (
@@ -53,9 +55,9 @@ CREATE TABLE books (
             AND available_quantity >= 0
             AND available_quantity <= quantity
         )
-);
+) ENGINE=InnoDB;
 
--- 6. Book requests table
+-- 6. BOOK REQUESTS TABLE
 CREATE TABLE book_requests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     student_id INT NOT NULL,
@@ -73,9 +75,9 @@ CREATE TABLE book_requests (
         FOREIGN KEY (book_id)
         REFERENCES books(id)
         ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
--- 7. Issue books table
+-- 7. ISSUE BOOKS TABLE
 CREATE TABLE issue_books (
     id INT PRIMARY KEY AUTO_INCREMENT,
     student_id INT NOT NULL,
@@ -84,23 +86,26 @@ CREATE TABLE issue_books (
     due_date DATE NOT NULL,
 
     CONSTRAINT fk_issue_student
-        FOREIGN KEY (student_id) REFERENCES students(id),
+        FOREIGN KEY (student_id)
+        REFERENCES students(id),
 
     CONSTRAINT fk_issue_book
-        FOREIGN KEY (book_id) REFERENCES books(id)
-);
+        FOREIGN KEY (book_id)
+        REFERENCES books(id)
+) ENGINE=InnoDB;
 
--- 8. Return books table
+-- 8. RETURN BOOKS TABLE
 CREATE TABLE return_books (
     id INT PRIMARY KEY AUTO_INCREMENT,
     issue_id INT NOT NULL UNIQUE,
     return_date DATE NOT NULL,
 
     CONSTRAINT fk_return_issue
-        FOREIGN KEY (issue_id) REFERENCES issue_books(id)
-);
+        FOREIGN KEY (issue_id)
+        REFERENCES issue_books(id)
+) ENGINE=InnoDB;
 
--- 9. Fines table
+-- 9. FINES TABLE
 CREATE TABLE fines (
     id INT PRIMARY KEY AUTO_INCREMENT,
     return_id INT NOT NULL,
@@ -108,47 +113,50 @@ CREATE TABLE fines (
     status VARCHAR(20) NOT NULL DEFAULT 'Pending',
 
     CONSTRAINT fk_fine_return
-        FOREIGN KEY (return_id) REFERENCES return_books(id),
+        FOREIGN KEY (return_id)
+        REFERENCES return_books(id),
 
     CONSTRAINT chk_fine_amount
         CHECK (amount >= 0)
-);
+) ENGINE=InnoDB;
 
--- Default admin
--- Generate a bcrypt hash in PHP before inserting the password.
--- Example: password_hash('admin123', PASSWORD_DEFAULT)
-
--- Sample authors
+-- SAMPLE AUTHORS
 INSERT INTO authors (name) VALUES
 ('Robert C. Martin'),
 ('Herbert Schildt'),
 ('Ramez Elmasri');
 
--- Sample publishers
+-- SAMPLE PUBLISHERS
 INSERT INTO publishers (name) VALUES
 ('Pearson'),
 ('McGraw Hill'),
 ('O Reilly');
 
--- Sample students
--- Replace these placeholder hashes with valid PHP password_hash() results.
+-- SAMPLE STUDENTS
+-- Replace these password placeholders with valid PHP password_hash() results.
 INSERT INTO students
 (name, email, phone, username, password, department)
 VALUES
 ('Rahul', 'rahul@gmail.com', '9876543210',
- 'rahul', 'REPLACE_WITH_VALID_PASSWORD_HASH', 'Computer Science'),
+ 'rahul', 'REPLACE_WITH_VALID_HASH_1', 'Computer Science'),
 ('Anu', 'anu@gmail.com', '9876543211',
- 'anu', 'REPLACE_WITH_VALID_PASSWORD_HASH', 'Computer Science'),
+ 'anu', 'REPLACE_WITH_VALID_HASH_2', 'Computer Science'),
 ('Arjun', 'arjun@gmail.com', '9876543212',
- 'ARJU', 'REPLACE_WITH_VALID_PASSWORD_HASH', 'BCA');
+ 'ARJU', 'REPLACE_WITH_VALID_HASH_3', 'BCA');
 
--- Sample books
+-- SAMPLE BOOKS
 INSERT INTO books
 (title, author_id, publisher_id, quantity, available_quantity)
 VALUES
 ('Clean Code', 1, 3, 5, 5),
 ('Java: The Complete Reference', 2, 2, 3, 3),
 ('Database System Concepts', 3, 1, 4, 4);
+
+-- ADMIN ACCOUNT
+-- Generate the hash with PHP password_hash('admin123', PASSWORD_DEFAULT).
+-- Then replace the placeholder below with that hash.
+INSERT INTO admin (username, password)
+VALUES ('admin', 'REPLACE_WITH_VALID_ADMIN_HASH');
 
 SELECT 'College Library database created successfully' AS message;
 ```
